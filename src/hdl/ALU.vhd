@@ -68,7 +68,7 @@ end component top_basys3;
     
 begin
 	-- PORT MAPS ---------------------------------------- 
-	adder0_inst : top_basys3
+	adder0_inst : full_adder
 	   port map (
 	       i_A => i_A(0),
 	       i_B => i_B(0),
@@ -76,7 +76,7 @@ begin
 	       o_S => w_result_final(0),
 	       o_Cout => w_cout(0)
 	       );
-	   adder1_inst : top_basys3
+	   adder1_inst :full_adder
 	   port map (
 	       i_A => i_A(1),
 	       i_B => i_B(1),
@@ -84,7 +84,7 @@ begin
 	       o_S => w_result_final(1),
 	       o_Cout => w_cout(1)
 	       );
-	   adder2_inst : top_basys3
+	   adder2_inst : full_adder
 	   port map (
 	       i_A => i_A(2),
 	       i_B => i_B(2),
@@ -92,7 +92,7 @@ begin
 	       o_S => w_result_final(2),
 	       o_Cout => w_cout(2)
 	       );
-	   adder3_inst : top_basys3
+	   adder3_inst : full_adder
 	   port map (
 	       i_A => i_A(3),
 	       i_B => i_B(3),
@@ -100,7 +100,7 @@ begin
 	       o_S => w_result_final(3),
 	       o_Cout => w_cout(3)
 	       );
-	   adder4_inst : top_basys3
+	   adder4_inst : full_adder
 	   port map (
 	       i_A => i_A(4),
 	       i_B => i_B(4),
@@ -108,7 +108,7 @@ begin
 	       o_S => w_result_final(4),
 	       o_Cout => w_cout(4)
 	       );
-	   adder5_inst : top_basys3
+	   adder5_inst : full_adder
 	   port map (
 	       i_A => i_A(5),
 	       i_B => i_B(5),
@@ -116,7 +116,7 @@ begin
 	       o_S => w_result_final(5),
 	       o_Cout => w_cout(5)
 	       );
-	   adder6_inst : top_basys3
+	   adder6_inst : full_adder
 	   port map (
 	       i_A => i_A(6),
 	       i_B => i_B(6),
@@ -124,7 +124,7 @@ begin
 	       o_S => w_result_final(6),
 	       o_Cout => w_cout(6)
 	       );
-	   adder7_inst : top_basys3
+	   adder7_inst : full_adder
 	   port map (
 	       i_A => i_A(7),
 	       i_B => i_B(7),
