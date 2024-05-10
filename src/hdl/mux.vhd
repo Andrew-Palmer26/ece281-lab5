@@ -32,7 +32,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity mux is
-    port ( i_sel  : in std_logic_vector (1 downto 0);
+    port ( i_sel  : in std_logic_vector (3 downto 0);
            i_A : in std_logic_vector (7 downto 0);
            i_result : in std_logic_vector (7 downto 0);
            i_B : in std_logic_vector (7 downto 0);
@@ -44,10 +44,10 @@ architecture Behavioral of mux is
 
 begin
 
-    o_data_out <= (i_A) when (i_sel = "00") else
-                  (i_B) when (i_sel = "01") else
-                  (i_result) when (i_sel = "10") else
-                  "0101010";
+    o_data_out <= (i_A) when (i_sel(0) = '1') else
+                  (i_B) when (i_sel(1) = '1') else
+                  (i_result) when (i_sel(2) = '1') else
+                  "01010100";
 
 
 end Behavioral;

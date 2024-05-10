@@ -27,10 +27,11 @@ library ieee;
 
 entity top_basys3 is
     port(
-        i_A, i_B : std_logic_vector(7 downto 0);
+        --i_A, i_B : std_logic_vector(7 downto 0);
         btnU     :   in std_logic;
         btnC     :   in std_logic; 
-        sw       :   in std_logic_vector(15 downto 0);
+        sw       :   in std_logic_vector(7 downto 0);
+        clk      :   in std_logic;
         
         led      :   out std_logic_vector(15 downto 0);
         seg      :   out std_logic_vector(6 downto 0);
@@ -54,7 +55,7 @@ end component twoscomp_decimal;
 component clock_divider is
 	generic ( constant k_DIV : natural := 2	); -- How many clk cycles until slow clock toggles
 											   -- Effectively, you divide the clk double this 
-											   -- number (e.g., k_DIV := 2 --> clock divider of 4)
+        									   -- number (e.g., k_DIV := 2 --> clock divider of 4)
 	port ( 	i_clk    : in std_logic;
 			i_reset  : in std_logic;		   -- asynchronous
 			o_clk    : out std_logic		   -- divided (slow) clock
@@ -64,7 +65,8 @@ end component clock_divider;
 component controller_fsm is
     port(
     i_reset, i_adv       : in std_logic;  
-    o_cycle              : out std_logic_vector(3 downto 0)
+    o_cycle              : out std_logic_vector(3 downto 0);
+    i_clk                : in std_logic
   );
 end component controller_fsm;
 
@@ -96,7 +98,7 @@ component sevenSegDecoder is
 end component sevenSegDecoder;
    
 component mux is
-    port ( i_sel  : in std_logic_vector (1 downto 0);
+    port ( i_sel  : in std_logic_vector (3 downto 0);
            i_A : in std_logic_vector (7 downto 0);
            i_result : in std_logic_vector (7 downto 0);
            i_B : in std_logic_vector (7 downto 0);
@@ -104,10 +106,10 @@ component mux is
     );
 end component mux;
 
-    signal w_A, w_B, w_mux, w_num : std_logic_vector(7 downto 0);
-    signal w_cycle                : std_logic_vector(3 downto 0);
+    signal w_A, w_B, w_mux : std_logic_vector(7 downto 0);
+    signal w_cycle, w_num                : std_logic_vector(3 downto 0);
     signal w_flags                : std_logic_vector(2 downto 0);
-    signal w_result               : std_logic_vector(2 downto 0);
+    signal w_result               : std_logic_vector(7 downto 0);
     signal  w_sign,w_hund, w_tens, w_ones : std_logic_vector(3 downto 0); --sign is the problem
     signal w_clk_div      : std_logic;
     signal w_anode                : std_logic_vector(3 downto 0);
@@ -118,17 +120,18 @@ begin
 	   port map(
         i_reset => btnU,
         i_adv   => btnC,   
-        o_cycle => w_cycle 
+        o_cycle => w_cycle,
+        i_clk   => clk
     );
     
-	w_A <= i_A when w_cycle = "0001" else w_A;
-	w_B <= i_B when w_cycle = "0010" else w_B;
+	w_A <= sw(7 downto 0) when w_cycle = "0001" else w_A;
+	w_B <= sw(7 downto 0) when w_cycle = "0010" else w_B;
 	
     ALU_inst : ALU
         port map(
-            i_A           => i_A,
-            i_B           => i_B,    
-            i_S           => "000",   --wtf does this do       
+            i_A           => w_A,
+            i_B           => w_B,    
+            i_S           => sw(2 downto 0),       
             o_flags       => led(15 downto 13),
             o_ALU_result  => w_result
             );
@@ -136,9 +139,9 @@ begin
 	mux_inst : mux 
 	   port map(
 	       i_sel       => w_cycle,
-           i_A         => i_A,
+           i_A         => w_A,
            i_result    => w_result,
-           i_B         => i_B,
+           i_B         => w_B,
            o_data_out  => w_mux
     );
 	
@@ -167,6 +170,14 @@ begin
 	   Port map( 
 	       i_D => w_num,
            o_S => seg
+	);
+	
+	clock_divider_inst : clock_divider
+	   generic map (k_div => 125000)
+	   port map ( 	
+	        i_clk   => clk,
+			i_reset => btnU, 		   -- asynchronous
+			o_clk   => w_clk_div		   -- divided (slow) clock
 	);
 	
 	led(3 downto 0) <= w_cycle;

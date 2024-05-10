@@ -34,44 +34,43 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity controller_fsm is
     port(
     i_reset, i_adv       : in std_logic;  
-    o_cycle              : out std_logic_vector(3 downto 0)
+    o_cycle              : out std_logic_vector(3 downto 0);
+    i_clk                : in std_logic
   );
 end controller_fsm;
 
 architecture Behavioral of controller_fsm is
-
-    signal w_cycle : std_logic_vector(3 downto 0):= "0001";
+    type state is (state0, state1, state2, state3);
     
+    signal f_Q, f_Q_next : state;
+
+    signal w_adv : std_logic := '1';
 begin
 
-advance_proc : process(i_reset, i_adv) 
-begin
-    case w_cycle is 
-        when "0001" => 
-            if i_adv = '1'
-                then w_cycle <= "0010";
-            elsif i_reset = '1'
-                then w_cycle <= "0001";
-            end if;
-        when "0010" => 
-            if i_adv = '1'
-                then w_cycle <= "0100";
-            elsif i_reset = '1'
-                then w_cycle <= "0001";
-            end if;
-        when "0100" => 
-            if i_adv = '1'
-                then w_cycle <= "1000";
-            elsif i_reset = '1'
-                then w_cycle <= "0001";
-            end if; 
-        when "1000" => 
-            if i_adv = '1'
-                then w_cycle <= "0001";
-            elsif i_reset = '1'
-                then w_cycle <= "0001";      
-            end if;
-        end case;
-    end process advance_proc;
-    o_cycle <= w_cycle;
+    f_Q_next <= state1 when (f_Q = state0) else
+                state2 when (f_Q = state1) else
+                state3 when (f_Q = state2) else
+                state0 when (f_Q = state3) else
+                state0;
+                
+    with f_Q select 
+        o_cycle <= "0001" when state0,
+                   "0010" when state1,
+                   "0100" when state2,
+                   "1000" when state3;
+
+register_proc : process (i_clk)
+    begin
+        if (rising_edge(i_clk)) then
+             -- synchronous reset
+            if i_reset = '1' then
+                f_Q <= state0;
+            elsif  (i_adv ='1' and w_adv = '1') then
+                f_Q <= f_Q_next;   
+                w_adv <= '0';             
+            elsif (i_adv = '0' and w_adv = '0') then
+                w_adv <= '1' after 1000 ms;
+            end if;   
+        end if;
+    end process;
 end Behavioral;

@@ -47,14 +47,14 @@ end ALU;
 
 architecture behavioral of ALU is 
 
-component top_basys3 is
+component full_adder is
 	port(
 		-- Switches
 		i_A, i_B, i_c		: in std_logic;
 		o_S     : out std_logic;
 		o_Cout     : out std_logic
 	);
-end component top_basys3;
+end component full_adder;
     
     signal w_result_final, w_result     : std_logic_vector(7 downto 0);
     signal w_B     : std_logic_vector(7 downto 0);
